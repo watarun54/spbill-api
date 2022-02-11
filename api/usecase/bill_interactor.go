@@ -1,10 +1,10 @@
 package usecase
 
 import (
+	"errors"
 	"fmt"
 	"github.com/watarun54/serverless-skill-manager/server/domain"
 	"sort"
-	"errors"
 )
 
 type (
@@ -131,8 +131,8 @@ func (interactor *BillInteractor) UserPayments(b domain.Bill) (userPaymentsRes [
 
 func (interactor *BillInteractor) Add(b domain.Bill) (bill domain.Bill, err error) {
 	// if err = validate(b); err != nil {
-  //   return
-  // }
+	//   return
+	// }
 	bill, err = interactor.BillRepository.Store(b)
 	return
 }
@@ -147,10 +147,9 @@ func (interactor *BillInteractor) DeleteById(b domain.Bill) (err error) {
 	return
 }
 
-
 func validate(bill domain.Bill) error {
-  if len(bill.Name) == 0 {
-    return errors.New("nameを入力してください")
-  }
-  return nil
+	if len(bill.Name) == 0 {
+		return errors.New("nameを入力してください")
+	}
+	return nil
 }

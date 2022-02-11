@@ -33,7 +33,6 @@ func (controller *UserController) GetMe(c Context) (err error) {
 	return
 }
 
-
 func (controller *UserController) UpdateMe(c Context) (err error) {
 	uid := userIDFromToken(c)
 	u := domain.User{
