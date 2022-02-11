@@ -22,6 +22,33 @@ func NewUserController(sqlHandler database.SqlHandler) *UserController {
 	}
 }
 
+func (controller *UserController) GetMe(c Context) (err error) {
+	uid := userIDFromToken(c)
+	user, err := controller.Interactor.UserById(uid)
+	if err != nil {
+		c.JSON(500, NewError(err))
+		return
+	}
+	c.JSON(200, NewResponse(user))
+	return
+}
+
+
+func (controller *UserController) UpdateMe(c Context) (err error) {
+	uid := userIDFromToken(c)
+	u := domain.User{
+		ID: uid,
+	}
+	c.Bind(&u)
+	user, err := controller.Interactor.Update(u)
+	if err != nil {
+		c.JSON(500, NewError(err))
+		return
+	}
+	c.JSON(201, NewResponse(user))
+	return
+}
+
 func (controller *UserController) Show(c Context) (err error) {
 	id, _ := strconv.Atoi(c.Param("id"))
 	user, err := controller.Interactor.UserById(id)

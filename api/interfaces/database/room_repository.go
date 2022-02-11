@@ -9,7 +9,7 @@ type RoomRepository struct {
 }
 
 func (repo *RoomRepository) FindOne(r domain.Room) (room domain.Room, err error) {
-	if err = repo.Debug().Take(&room, r.ID).Related(&room.Users, "Users").Error; err != nil {
+	if err = repo.Debug().Take(&room, r.ID).Related(&room.Users, "Users").Related(&room.Bills, "Bills").Error; err != nil {
 		return
 	}
 	return

@@ -9,7 +9,7 @@ type (
 		Email          string `json:"email" gorm:"unique;not null;size:255"`
 		HashedPassword string `json:"-"`
 		LineID         string `json:"line_id"`
-		Papers         []Paper
+		Rooms          []Room `json:"rooms" gorm:"many2many:user_rooms;save_associations:false;"`
 	}
 
 	UserForm struct {

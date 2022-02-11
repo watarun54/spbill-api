@@ -100,3 +100,7 @@ func (handler *SqlHandler) Replace(values ...interface{}) *gorm.Association {
 func (handler *SqlHandler) Debug() *gorm.DB {
 	return handler.Conn.Debug()
 }
+
+func (handler *SqlHandler) Model(value interface{}) *gorm.DB {
+	return handler.Conn.Model(value)
+}

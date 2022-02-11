@@ -3,7 +3,6 @@ module github.com/watarun54/serverless-skill-manager/server
 go 1.13
 
 require (
-	github.com/PuerkitoBio/goquery v1.5.1
 	github.com/aws/aws-lambda-go v0.0.0-20190129190457-dcf76fe64fb6
 	github.com/awslabs/aws-lambda-go-api-proxy v0.6.0
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
