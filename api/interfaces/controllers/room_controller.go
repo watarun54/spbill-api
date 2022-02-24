@@ -59,8 +59,16 @@ func (controller *RoomController) Index(c Context) (err error) {
 }
 
 func (controller *RoomController) Create(c Context) (err error) {
-	r := domain.Room{}
-	c.Bind(&r)
+	uid := userIDFromToken(c)
+	rForm := domain.RoomForm{
+		UserIds: []int{uid},
+	}
+	c.Bind(&rForm)
+	r, err := controller.Interactor.ConvertRoomFormToRoom(rForm)
+	if err != nil {
+		c.JSON(500, NewError(err))
+		return
+	}
 	room, err := controller.Interactor.Add(r)
 	if err != nil {
 		c.JSON(500, NewError(err))

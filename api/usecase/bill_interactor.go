@@ -121,7 +121,7 @@ func (interactor *BillInteractor) UserPayments(b domain.Bill) (userPaymentsRes [
 				Amount:   last.Amount})
 		}
 		fmt.Println("userPayments", userPayments)
-		if len(userPayments) == 0 {
+		if len(userPayments) <= 1 {
 			break
 		}
 	}

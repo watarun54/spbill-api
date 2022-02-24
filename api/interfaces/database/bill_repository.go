@@ -26,19 +26,22 @@ func (repo *BillRepository) Store(b domain.Bill) (bill domain.Bill, err error) {
 	if err = repo.Debug().Create(&b).Error; err != nil {
 		return
 	}
-	bill = b
+	if err = repo.Debug().Preload("Payer").Preload("Payees").Find(&bill, b.ID).Error; err != nil {
+		return
+	}
 	return
 }
 
 func (repo *BillRepository) Update(b domain.Bill) (bill domain.Bill, err error) {
-
 	if err = repo.Debug().Set("gorm:save_associations", false).Take(&domain.Bill{ID: b.ID}).Updates(&b).Error; err != nil {
 		return
 	}
 	if err = repo.Debug().Model(&b).Association("Payees").Replace(b.Payees).Error; err != nil {
 		return
 	}
-	bill = b
+	if err = repo.Debug().Preload("Payer").Preload("Payees").Find(&bill, b.ID).Error; err != nil {
+		return
+	}
 	return
 }
 

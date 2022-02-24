@@ -71,7 +71,7 @@ func (controller *BillController) Update(c Context) (err error) {
 		c.JSON(500, NewError(err))
 		return
 	}
-	c.JSON(201, NewResponse(bill))
+	c.JSON(201, bill)
 	return
 }
 
@@ -85,6 +85,6 @@ func (controller *BillController) Delete(c Context) (err error) {
 		c.JSON(500, NewError(err))
 		return
 	}
-	c.JSON(200, NewResponse(bill))
+	c.JSON(200, bill)
 	return
 }

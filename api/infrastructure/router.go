@@ -21,6 +21,7 @@ func Handler(ctx context.Context, req events.APIGatewayProxyRequest) (events.API
 func Init() {
 	e := echo.New()
 
+	linebotController := controllers.NewLinebotController(NewSqlHandler())
 	authController := controllers.NewAuthController(NewSqlHandler())
 	userController := controllers.NewUserController(NewSqlHandler())
 	roomController := controllers.NewRoomController(NewSqlHandler())
@@ -36,8 +37,13 @@ func Init() {
 	e.POST("/login", func(c echo.Context) error { return authController.Login(c) })
 	e.POST("/signup", func(c echo.Context) error { return userController.Create(c) })
 
+	line := e.Group("/linebot")
+	line.POST("", func(c echo.Context) error { return linebotController.GetTest(c) })
+	line.POST("", func(c echo.Context) error { return linebotController.Post(c) })
+
 	api := e.Group("/api")
 	api.Use(middleware.JWTWithConfig(controllers.NewJWTConfig()))
+	api.GET("/users/:id", func(c echo.Context) error { return userController.Show(c) })
 	api.GET("/users/me", func(c echo.Context) error { return userController.GetMe(c) })
 	api.PUT("/users/me", func(c echo.Context) error { return userController.UpdateMe(c) })
 
