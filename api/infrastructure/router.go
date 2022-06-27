@@ -9,7 +9,7 @@ import (
 	"github.com/labstack/echo/middleware"
 	"os"
 
-	"github.com/watarun54/serverless-skill-manager/server/interfaces/controllers"
+	"github.com/watarun54/spbill-api/server/interfaces/controllers"
 )
 
 var echoLambda *echoadapter.EchoLambda

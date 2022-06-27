@@ -3,9 +3,9 @@ package controllers
 import (
 	"strconv"
 
-	"github.com/watarun54/serverless-skill-manager/server/domain"
-	"github.com/watarun54/serverless-skill-manager/server/interfaces/database"
-	"github.com/watarun54/serverless-skill-manager/server/usecase"
+	"github.com/watarun54/spbill-api/server/domain"
+	"github.com/watarun54/spbill-api/server/interfaces/database"
+	"github.com/watarun54/spbill-api/server/usecase"
 )
 
 type BillController struct {

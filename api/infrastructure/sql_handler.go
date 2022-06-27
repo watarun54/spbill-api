@@ -9,7 +9,7 @@ import (
 	_ "github.com/jinzhu/gorm/dialects/mysql"
 	"github.com/joho/godotenv"
 
-	"github.com/watarun54/serverless-skill-manager/server/interfaces/database"
+	"github.com/watarun54/spbill-api/server/interfaces/database"
 )
 
 type SqlHandler struct {

@@ -1,7 +1,7 @@
 package database
 
 import (
-	"github.com/watarun54/serverless-skill-manager/server/domain"
+	"github.com/watarun54/spbill-api/server/domain"
 )
 
 type BillRepository struct {
