@@ -1,22 +1,18 @@
-version: '3.5'
+version: '3'
 
 services:
   echo:
-    container_name: echo
     build:
-      context: .
-      dockerfile: ./docker/api/Dockerfile
-      target: build
-    command: realize start --run --no-config
+      context: ./api
     volumes:
-      - ./api:/go/src/github.com/watarun54/serverless-skill-manager/server
+      - ./api:/go/src/github.com/watarun54/spbill-api/server
     ports:
       - "8000:8000"
+    depends_on:
+      - mysql
   mysql:
-    container_name: mysql
     build:
-      context: .
-      dockerfile: ./docker/mysql/Dockerfile
+      context: ./mysql
     environment:
       MYSQL_ROOT_PASSWORD: root
       MYSQL_DATABASE: sample
