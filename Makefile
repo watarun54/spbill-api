@@ -30,3 +30,5 @@ down-rm:
 	docker-compose down --rmi all --volumes
 restart:
 	docker-compose restart $(CONTAINER)
+exec:
+	docker-compose exec $(CONTAINER) sh

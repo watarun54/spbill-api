@@ -13,7 +13,7 @@ import (
 )
 
 type LinebotController struct {
-	UserInteractor  usecase.UserInteractor
+	UserInteractor usecase.UserInteractor
 }
 
 func NewLinebotController(sqlHandler database.SqlHandler) *LinebotController {
@@ -64,34 +64,34 @@ func (controller *LinebotController) Post(c Context) (err error) {
 				if _, err = bot.ReplyMessage(event.ReplyToken, resMessage).Do(); err != nil {
 					log.Printf("send error: %v", err)
 				}
-			// 	user, _ := controller.UserInteractor.UserByLineID(lineID)
-			// 	if user.ID == 0 {
-			// 		message.Text = fmt.Sprintf("以下の Line ID を登録してください\n\n%v", lineID)
-			// 	} else {
-			// 		// URLを抽出
-			// 		re, _ := regexp.Compile(`http(s)://[\w\d/%#$&?()~_.=+-]+`)
-			// 		url := string(re.Find([]byte(message.Text)))
-			// 		com := domain.Paper{
-			// 			UserID: user.ID,
-			// 			URL:    url,
-			// 		}
-			// 		c.Bind(&com)
-			// 		title, err := controller.ScrapeHandler.GetTitleFromURL(com.URL)
-			// 		if err != nil {
-			// 			com.Text = "Faild to scrape title"
-			// 		} else {
-			// 			com.Text = title
-			// 		}
-			// 		_, err = controller.PaperInteractor.Add(com)
-			// 		if err != nil {
-			// 			message.Text = "記事の登録に失敗しました"
-			// 		}
-			// 		message.Text = "記事の登録に成功しました"
-			// 	}
-			// 	resMessage := linebot.NewTextMessage(message.Text)
-			// 	if _, err = bot.ReplyMessage(event.ReplyToken, resMessage).Do(); err != nil {
-			// 		log.Printf("send error: %v", err)
-			// 	}
+				// 	user, _ := controller.UserInteractor.UserByLineID(lineID)
+				// 	if user.ID == 0 {
+				// 		message.Text = fmt.Sprintf("以下の Line ID を登録してください\n\n%v", lineID)
+				// 	} else {
+				// 		// URLを抽出
+				// 		re, _ := regexp.Compile(`http(s)://[\w\d/%#$&?()~_.=+-]+`)
+				// 		url := string(re.Find([]byte(message.Text)))
+				// 		com := domain.Paper{
+				// 			UserID: user.ID,
+				// 			URL:    url,
+				// 		}
+				// 		c.Bind(&com)
+				// 		title, err := controller.ScrapeHandler.GetTitleFromURL(com.URL)
+				// 		if err != nil {
+				// 			com.Text = "Faild to scrape title"
+				// 		} else {
+				// 			com.Text = title
+				// 		}
+				// 		_, err = controller.PaperInteractor.Add(com)
+				// 		if err != nil {
+				// 			message.Text = "記事の登録に失敗しました"
+				// 		}
+				// 		message.Text = "記事の登録に成功しました"
+				// 	}
+				// 	resMessage := linebot.NewTextMessage(message.Text)
+				// 	if _, err = bot.ReplyMessage(event.ReplyToken, resMessage).Do(); err != nil {
+				// 		log.Printf("send error: %v", err)
+				// 	}
 			}
 		}
 	}
