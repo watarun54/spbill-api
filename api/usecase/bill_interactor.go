@@ -19,6 +19,7 @@ type (
 	BillInteractor struct {
 		BillRepository IBillRepository
 		UserRepository IUserRepository
+		RoomRepository IRoomRepository
 	}
 )
 
@@ -52,12 +53,14 @@ func (interactor *BillInteractor) Bills(b domain.Bill) (bills domain.Bills, err 
 }
 
 func (interactor *BillInteractor) UserPayments(b domain.Bill) (userPaymentsRes []domain.UserPaymentRes, err error) {
-	bills, err := interactor.BillRepository.FindAll(b)
+	room, err := interactor.RoomRepository.FindOne(domain.Room{
+		ID: b.RoomID,
+	})
 	if err != nil {
 		return
 	}
-
-	users, err := interactor.UserRepository.FindAll()
+	users := room.Users
+	bills, err := interactor.BillRepository.FindAll(b)
 	if err != nil {
 		return
 	}

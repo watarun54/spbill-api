@@ -30,6 +30,9 @@ func NewRoomController(sqlHandler database.SqlHandler) *RoomController {
 			UserRepository: &database.UserRepository{
 				SqlHandler: sqlHandler,
 			},
+			RoomRepository: &database.RoomRepository{
+				SqlHandler: sqlHandler,
+			},
 		},
 	}
 }
