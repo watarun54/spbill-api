@@ -9,7 +9,7 @@ import (
 	_ "github.com/jinzhu/gorm/dialects/mysql"
 	"github.com/joho/godotenv"
 
-	"github.com/watarun54/serverless-skill-manager/server/interfaces/database"
+	"github.com/watarun54/spbill-api/server/interfaces/database"
 )
 
 type SqlHandler struct {
@@ -99,4 +99,8 @@ func (handler *SqlHandler) Replace(values ...interface{}) *gorm.Association {
 
 func (handler *SqlHandler) Debug() *gorm.DB {
 	return handler.Conn.Debug()
+}
+
+func (handler *SqlHandler) Model(value interface{}) *gorm.DB {
+	return handler.Conn.Model(value)
 }

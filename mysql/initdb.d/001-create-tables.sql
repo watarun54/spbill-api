@@ -7,7 +7,7 @@ create table IF not exists `users` (
  `name`             VARCHAR(255) NOT NULL,
  `email`            VARCHAR(255) NOT NULL UNIQUE,
  `hashed_password`  VARCHAR(255) NOT NULL,
- `line_id`          VARCHAR(255) UNIQUE,
+ `line_id`          VARCHAR(255),
  `created_at`       DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
  `updated_at`       DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`)
@@ -44,6 +44,7 @@ create table IF not exists `user_rooms` (
  `id`               BIGINT AUTO_INCREMENT,
  `user_id`          BIGINT NOT NULL,
  `room_id`          BIGINT NOT NULL,
+ `pay_amount`       BIGINT,
  `created_at`       DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
  `updated_at`       DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`)
@@ -57,40 +58,35 @@ insert into user_rooms(user_id, room_id) values(5, 2);
 
 
 ---- drop ----
-DROP TABLE IF EXISTS `comments`;
+DROP TABLE IF EXISTS `bills`;
 
 ---- create ----
-create table IF not exists `comments` (
+create table IF not exists `bills` (
  `id`               BIGINT AUTO_INCREMENT,
- `text`             VARCHAR(255) NOT NULL,
- `user_id`          BIGINT NOT NULL,
+ `name`             VARCHAR(255) NOT NULL,
+ `amount`           BIGINT DEFAULT 0,
+ `room_id`          BIGINT NOT NULL,
+ `payer_id`         BIGINT NOT NULL,
  `created_at`       DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
  `updated_at`       DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`)
 ) DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
 
-insert into comments(text, user_id) values("comment1", 1);
-insert into comments(text, user_id) values("comment2", 1);
-insert into comments(text, user_id) values("comment3", 2);
-insert into comments(text, user_id) values("comment4", 2);
-
+insert into bills(name, amount, room_id, payer_id) values("bill1", 1000, 1, 1);
+insert into bills(name, amount, room_id, payer_id) values("bill2", 2000, 1, 2);
 
 ---- drop ----
-DROP TABLE IF EXISTS `papers`;
+DROP TABLE IF EXISTS `bill_payees`;
 
 ---- create ----
-create table IF not exists `papers` (
+create table IF not exists `bill_payees` (
  `id`               BIGINT AUTO_INCREMENT,
- `url`              VARCHAR(255) NOT NULL,
- `text`             VARCHAR(255) NOT NULL,
- `user_id`          BIGINT NOT NULL,
- `is_deleted`       BOOLEAN DEFAULT 0,
+ `bill_id`          BIGINT NOT NULL,
+ `payee_id`         BIGINT NOT NULL,
  `created_at`       DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
  `updated_at`       DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`)
 ) DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
 
-insert into papers(url, text, user_id) values("http://example.com/", "paper1", 1);
-insert into papers(url, text, user_id) values("http://example.com/", "paper2", 1);
-insert into papers(url, text, user_id) values("http://example.com/", "paper3", 2);
-insert into papers(url, text, user_id) values("http://example.com/", "paper4", 2);
+insert into bill_payees(bill_id, payee_id) values(1, 2);
+insert into bill_payees(bill_id, payee_id) values(1, 3);

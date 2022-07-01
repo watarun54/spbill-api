@@ -3,9 +3,9 @@ package controllers
 import (
 	"strconv"
 
-	"github.com/watarun54/serverless-skill-manager/server/domain"
-	"github.com/watarun54/serverless-skill-manager/server/interfaces/database"
-	"github.com/watarun54/serverless-skill-manager/server/usecase"
+	"github.com/watarun54/spbill-api/server/domain"
+	"github.com/watarun54/spbill-api/server/interfaces/database"
+	"github.com/watarun54/spbill-api/server/usecase"
 )
 
 type UserController struct {
@@ -20,6 +20,32 @@ func NewUserController(sqlHandler database.SqlHandler) *UserController {
 			},
 		},
 	}
+}
+
+func (controller *UserController) GetMe(c Context) (err error) {
+	uid := userIDFromToken(c)
+	user, err := controller.Interactor.UserById(uid)
+	if err != nil {
+		c.JSON(500, NewError(err))
+		return
+	}
+	c.JSON(200, NewResponse(user))
+	return
+}
+
+func (controller *UserController) UpdateMe(c Context) (err error) {
+	uid := userIDFromToken(c)
+	u := domain.User{
+		ID: uid,
+	}
+	c.Bind(&u)
+	user, err := controller.Interactor.Update(u)
+	if err != nil {
+		c.JSON(500, NewError(err))
+		return
+	}
+	c.JSON(201, NewResponse(user))
+	return
 }
 
 func (controller *UserController) Show(c Context) (err error) {

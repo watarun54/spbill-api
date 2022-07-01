@@ -18,4 +18,5 @@ type SqlHandler interface {
 	Association(string) *gorm.Association
 	Replace(...interface{}) *gorm.Association
 	Debug() *gorm.DB
+	Model(interface{}) *gorm.DB
 }

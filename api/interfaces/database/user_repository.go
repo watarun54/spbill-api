@@ -1,7 +1,7 @@
 package database
 
 import (
-	"github.com/watarun54/serverless-skill-manager/server/domain"
+	"github.com/watarun54/spbill-api/server/domain"
 )
 
 type UserRepository struct {
@@ -9,7 +9,7 @@ type UserRepository struct {
 }
 
 func (repo *UserRepository) FindById(id int) (user domain.User, err error) {
-	if err = repo.Debug().Find(&user, id).Error; err != nil {
+	if err = repo.Debug().Find(&user, id).Related(&user.Rooms, "Rooms").Error; err != nil {
 		return
 	}
 	return
@@ -59,9 +59,6 @@ func (repo *UserRepository) Update(u domain.User) (user domain.User, err error) 
 }
 
 func (repo *UserRepository) DeleteById(user domain.User) (err error) {
-	if err = repo.Debug().Where("user_id = ?", user.ID).Delete(user.Papers).Error; err != nil {
-		return
-	}
 	if err = repo.Debug().Delete(&user).Error; err != nil {
 		return
 	}
