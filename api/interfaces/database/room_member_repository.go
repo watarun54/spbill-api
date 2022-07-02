@@ -8,6 +8,20 @@ type RoomMemberRepository struct {
 	SqlHandler
 }
 
+func (repo *RoomMemberRepository) FindById(id int) (member domain.RoomMember, err error) {
+	if err = repo.Debug().Find(&member, id).Error; err != nil {
+		return
+	}
+	return
+}
+
+func (repo *RoomMemberRepository) FindByIds(ids []int) (members []domain.RoomMember, err error) {
+	if err = repo.Debug().Where("id IN (?)", ids).Find(&members).Error; err != nil {
+		return
+	}
+	return
+}
+
 func (repo *RoomMemberRepository) Store(rm domain.RoomMember) (roomMember domain.RoomMember, err error) {
 	if err = repo.Debug().Create(&rm).Error; err != nil {
 		return
@@ -16,5 +30,12 @@ func (repo *RoomMemberRepository) Store(rm domain.RoomMember) (roomMember domain
 		return
 	}
 	roomMember = rm
+	return
+}
+
+func (repo *RoomMemberRepository) Delete(member domain.RoomMember) (err error) {
+	if err = repo.Debug().Delete(&member).Error; err != nil {
+		return
+	}
 	return
 }

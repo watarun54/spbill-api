@@ -44,7 +44,13 @@ func (repo *RoomRepository) Update(r domain.Room) (room domain.Room, err error) 
 	if err = repo.Debug().Model(&r).Association("Users").Replace(r.Users).Error; err != nil {
 		return
 	}
-	room = r
+	if err = repo.Debug().Take(&room, r.ID).
+		Related(&room.Users, "Users").
+		Related(&room.Bills, "Bills").
+		Related(&room.RoomMembers, "RoomMembers").
+		Error; err != nil {
+		return
+	}
 	return
 }
 

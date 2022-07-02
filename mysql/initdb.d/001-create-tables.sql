@@ -71,6 +71,9 @@ create table IF not exists `room_members` (
 
 insert into room_members(name, room_id) values("太郎", 1);
 insert into room_members(name, room_id) values("花子", 1);
+insert into room_members(name, room_id) values("連", 1);
+insert into room_members(name, room_id) values("健二", 1);
+insert into room_members(name, room_id) values("玲子", 1);
 
 ---- drop ----
 DROP TABLE IF EXISTS `bills`;
@@ -105,3 +108,5 @@ create table IF not exists `bill_payees` (
 
 insert into bill_payees(bill_id, payee_id) values(1, 2);
 insert into bill_payees(bill_id, payee_id) values(1, 3);
+insert into bill_payees(bill_id, payee_id) values(2, 3);
+insert into bill_payees(bill_id, payee_id) values(2, 4);

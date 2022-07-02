@@ -59,7 +59,8 @@ func Init() {
 	api.DELETE("/rooms/:id", func(c echo.Context) error { return roomController.Delete(c) })
 	api.GET("/rooms/:id/bills", func(c echo.Context) error { return roomController.FetchBills(c) })
 	api.GET("/rooms/:id/user_payments", func(c echo.Context) error { return roomController.UserPayments(c) })
-	api.POST("/rooms/:id/member", func(c echo.Context) error { return roomController.AddMember(c) })
+	api.POST("/rooms/:id/members", func(c echo.Context) error { return roomController.AddMember(c) })
+	api.DELETE("/rooms/:id/members/:member_id", func(c echo.Context) error { return roomController.DeleteMember(c) })
 
 	// Start server
 	isLambda := os.Getenv("LAMBDA")

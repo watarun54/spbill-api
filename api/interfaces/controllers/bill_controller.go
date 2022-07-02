@@ -18,7 +18,7 @@ func NewBillController(sqlHandler database.SqlHandler) *BillController {
 			BillRepository: &database.BillRepository{
 				SqlHandler: sqlHandler,
 			},
-			UserRepository: &database.UserRepository{
+			RoomMemberRepository: &database.RoomMemberRepository{
 				SqlHandler: sqlHandler,
 			},
 		},

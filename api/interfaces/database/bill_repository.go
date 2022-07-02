@@ -46,7 +46,7 @@ func (repo *BillRepository) Update(b domain.Bill) (bill domain.Bill, err error) 
 }
 
 func (repo *BillRepository) DeleteById(bill domain.Bill) (err error) {
-	if err = repo.Debug().Model(&bill).Association("Payees").Replace(&[]domain.User{}).Error; err != nil {
+	if err = repo.Debug().Model(&bill).Association("Payees").Replace(&[]domain.RoomMember{}).Error; err != nil {
 		return
 	}
 	if err = repo.Debug().Delete(&bill).Error; err != nil {

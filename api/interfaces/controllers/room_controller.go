@@ -28,15 +28,15 @@ func NewRoomController(sqlHandler database.SqlHandler) *RoomController {
 			BillRepository: &database.BillRepository{
 				SqlHandler: sqlHandler,
 			},
-			UserRepository: &database.UserRepository{
-				SqlHandler: sqlHandler,
-			},
 			RoomRepository: &database.RoomRepository{
 				SqlHandler: sqlHandler,
 			},
 		},
 		RoomMemberInteractor: usecase.RoomMemberInteractor{
 			RoomMemberRepository: &database.RoomMemberRepository{
+				SqlHandler: sqlHandler,
+			},
+			BillRepository: &database.BillRepository{
 				SqlHandler: sqlHandler,
 			},
 		},
@@ -163,6 +163,23 @@ func (controller *RoomController) AddMember(c Context) (err error) {
 		return
 	}
 	room, err := controller.Interactor.Room(domain.Room{ID: id})
+	if err != nil {
+		c.JSON(500, NewError(err))
+		return
+	}
+	c.JSON(200, room)
+	return
+}
+
+func (controller *RoomController) DeleteMember(c Context) (err error) {
+	memberId, _ := strconv.Atoi(c.Param("member_id"))
+	err = controller.RoomMemberInteractor.Delete(domain.RoomMember{ID: memberId})
+	if err != nil {
+		c.JSON(500, NewError(err))
+		return
+	}
+	roomId, _ := strconv.Atoi(c.Param("id"))
+	room, err := controller.Interactor.Room(domain.Room{ID: roomId})
 	if err != nil {
 		c.JSON(500, NewError(err))
 		return

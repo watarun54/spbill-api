@@ -17,19 +17,19 @@ type (
 	}
 
 	BillInteractor struct {
-		BillRepository IBillRepository
-		UserRepository IUserRepository
-		RoomRepository IRoomRepository
+		BillRepository       IBillRepository
+		RoomRepository       IRoomRepository
+		RoomMemberRepository IRoomMemberRepository
 	}
 )
 
-type UserPayment struct {
-	UserId int
-	Amount int
+type RoomMemberPayment struct {
+	RoomMemberId int
+	Amount       int
 }
 
 func (interactor *BillInteractor) ConvertBillFormToBill(billForm domain.BillForm) (bill domain.Bill, err error) {
-	payees, err := interactor.UserRepository.FindByIds(billForm.PayeeIds)
+	payees, err := interactor.RoomMemberRepository.FindByIds(billForm.PayeeIds)
 	if err != nil {
 		return
 	}
@@ -52,81 +52,99 @@ func (interactor *BillInteractor) Bills(b domain.Bill) (bills domain.Bills, err 
 	return
 }
 
-func (interactor *BillInteractor) UserPayments(b domain.Bill) (userPaymentsRes []domain.UserPaymentRes, err error) {
+func (interactor *BillInteractor) UserPayments(b domain.Bill) (memberPaymentsRes []domain.RoomMemberPaymentRes, err error) {
 	room, err := interactor.RoomRepository.FindOne(domain.Room{
 		ID: b.RoomID,
 	})
 	if err != nil {
 		return
 	}
-	users := room.Users
+	roomMembers := room.RoomMembers
 	bills, err := interactor.BillRepository.FindAll(b)
 	if err != nil {
 		return
 	}
 
+	// memberId と 支払い差分 のペア
 	response := map[int]int{}
-	for _, user := range users {
-		response[user.ID] = 0
+	for _, member := range roomMembers {
+		response[member.ID] = 0
 	}
 	for _, bill := range bills {
 		response[bill.Payer.ID] += bill.Amount
 		for _, payee := range bill.Payees {
-			response[payee.ID] -= bill.Amount / len(bill.Payees)
+			response[payee.ID] -= bill.Amount / (len(bill.Payees) + 1)
 		}
 	}
 
-	userIdToUsers := map[int]domain.User{}
-	for _, user := range users {
-		userIdToUsers[user.ID] = user
+	memberIdToMembers := map[int]domain.RoomMember{}
+	for _, member := range roomMembers {
+		memberIdToMembers[member.ID] = member
 	}
 
-	userPayments := []UserPayment{}
-	for userId, amount := range response {
+	memberPayments := []RoomMemberPayment{}
+	for memberId, amount := range response {
 		if amount != 0 {
-			userPayments = append(userPayments, UserPayment{UserId: userId, Amount: amount})
+			memberPayments = append(memberPayments, RoomMemberPayment{RoomMemberId: memberId, Amount: amount})
 		}
 	}
 
-	var first UserPayment
-	var last UserPayment
+	var first RoomMemberPayment
+	var last RoomMemberPayment
 	var diff int
 
 	for {
-		sort.SliceStable(userPayments, func(i, j int) bool { return userPayments[i].Amount < userPayments[j].Amount })
-		fmt.Println("userPayments", userPayments)
-		first = userPayments[0]
-		userPayments = userPayments[1:]
-		last = userPayments[len(userPayments)-1]
-		userPayments = userPayments[:len(userPayments)-1]
-		diff = first.Amount + last.Amount
-		if diff > 0 {
-			fmt.Printf("from: %v to: %v amount: %v\n", first.UserId, last.UserId, -(first.Amount))
-			userPaymentsRes = append(userPaymentsRes, domain.UserPaymentRes{
-				FromUser: userIdToUsers[first.UserId],
-				ToUser:   userIdToUsers[last.UserId],
-				Amount:   -(first.Amount)})
-			last.Amount = diff
-			userPayments = append(userPayments, last)
-		} else if diff < 0 {
-			fmt.Printf("from: %v to: %v amount: %v\n", last.UserId, first.UserId, last.Amount)
-			userPaymentsRes = append(userPaymentsRes, domain.UserPaymentRes{
-				FromUser: userIdToUsers[last.UserId],
-				ToUser:   userIdToUsers[first.UserId],
-				Amount:   last.Amount})
-			first.Amount = diff
-			userPayments = append(userPayments, first)
-		} else {
-			fmt.Printf("from: %v to: %v amount: %v\n", last.UserId, first.UserId, last.Amount)
-			userPaymentsRes = append(userPaymentsRes, domain.UserPaymentRes{
-				FromUser: userIdToUsers[last.UserId],
-				ToUser:   userIdToUsers[first.UserId],
-				Amount:   last.Amount})
-		}
-		fmt.Println("userPayments", userPayments)
-		if len(userPayments) <= 1 {
+		sort.SliceStable(memberPayments, func(i, j int) bool { return memberPayments[i].Amount < memberPayments[j].Amount })
+
+		fmt.Println("memberPayments", memberPayments)
+
+		if len(memberPayments) <= 1 {
 			break
 		}
+
+		first = memberPayments[0]
+		memberPayments = memberPayments[1:]
+
+		last = memberPayments[len(memberPayments)-1]
+		memberPayments = memberPayments[:len(memberPayments)-1]
+
+		if first.Amount > 0 && last.Amount > 0 {
+			break
+		}
+
+		diff = first.Amount + last.Amount
+
+		if diff > 0 {
+			fmt.Printf("from: %v to: %v amount: %v\n", first.RoomMemberId, last.RoomMemberId, -(first.Amount))
+
+			memberPaymentsRes = append(memberPaymentsRes, domain.RoomMemberPaymentRes{
+				FromMember: memberIdToMembers[first.RoomMemberId],
+				ToMember:   memberIdToMembers[last.RoomMemberId],
+				Amount:     -(first.Amount),
+			})
+			last.Amount = diff
+			memberPayments = append(memberPayments, last)
+		} else if diff < 0 {
+			fmt.Printf("from: %v to: %v amount: %v\n", last.RoomMemberId, first.RoomMemberId, last.Amount)
+
+			memberPaymentsRes = append(memberPaymentsRes, domain.RoomMemberPaymentRes{
+				FromMember: memberIdToMembers[last.RoomMemberId],
+				ToMember:   memberIdToMembers[first.RoomMemberId],
+				Amount:     last.Amount,
+			})
+			first.Amount = diff
+			memberPayments = append(memberPayments, first)
+		} else {
+			fmt.Printf("from: %v to: %v amount: %v\n", last.RoomMemberId, first.RoomMemberId, last.Amount)
+
+			memberPaymentsRes = append(memberPaymentsRes, domain.RoomMemberPaymentRes{
+				FromMember: memberIdToMembers[last.RoomMemberId],
+				ToMember:   memberIdToMembers[first.RoomMemberId],
+				Amount:     last.Amount,
+			})
+		}
+
+		fmt.Println("memberPayments", memberPayments)
 	}
 
 	return
