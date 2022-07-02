@@ -8,7 +8,7 @@ import (
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/mysql"
 	"github.com/joho/godotenv"
-
+	"github.com/watarun54/spbill-api/server/domain"
 	"github.com/watarun54/spbill-api/server/interfaces/database"
 )
 
@@ -38,6 +38,7 @@ func NewSqlHandler() database.SqlHandler {
 	log.Println("connected to", dbHost)
 	sqlHandler := new(SqlHandler)
 	sqlHandler.Conn = conn
+	conn.AutoMigrate(&domain.RoomMember{})
 	return sqlHandler
 }
 

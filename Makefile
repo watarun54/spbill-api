@@ -32,3 +32,7 @@ restart:
 	docker-compose restart $(CONTAINER)
 exec:
 	docker-compose exec $(CONTAINER) sh
+db:
+	docker-compose exec mysql bash -c "mysql -u docker -pdocker -D sample"
+seed:
+	sh ./init-mysql.sh

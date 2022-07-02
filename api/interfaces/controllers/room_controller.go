@@ -9,8 +9,9 @@ import (
 )
 
 type RoomController struct {
-	Interactor     usecase.RoomInteractor
-	BillInteractor usecase.BillInteractor
+	Interactor           usecase.RoomInteractor
+	BillInteractor       usecase.BillInteractor
+	RoomMemberInteractor usecase.RoomMemberInteractor
 }
 
 func NewRoomController(sqlHandler database.SqlHandler) *RoomController {
@@ -31,6 +32,11 @@ func NewRoomController(sqlHandler database.SqlHandler) *RoomController {
 				SqlHandler: sqlHandler,
 			},
 			RoomRepository: &database.RoomRepository{
+				SqlHandler: sqlHandler,
+			},
+		},
+		RoomMemberInteractor: usecase.RoomMemberInteractor{
+			RoomMemberRepository: &database.RoomMemberRepository{
 				SqlHandler: sqlHandler,
 			},
 		},
@@ -142,5 +148,25 @@ func (controller *RoomController) UserPayments(c Context) (err error) {
 		return
 	}
 	c.JSON(200, userPayments)
+	return
+}
+
+func (controller *RoomController) AddMember(c Context) (err error) {
+	id, _ := strconv.Atoi(c.Param("id"))
+	roomMember := domain.RoomMember{
+		RoomID: id,
+	}
+	c.Bind(&roomMember)
+	_, err = controller.RoomMemberInteractor.Add(roomMember)
+	if err != nil {
+		c.JSON(500, NewError(err))
+		return
+	}
+	room, err := controller.Interactor.Room(domain.Room{ID: id})
+	if err != nil {
+		c.JSON(500, NewError(err))
+		return
+	}
+	c.JSON(200, room)
 	return
 }

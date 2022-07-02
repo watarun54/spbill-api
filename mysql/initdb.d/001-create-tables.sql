@@ -56,6 +56,21 @@ insert into user_rooms(user_id, room_id) values(3, 1);
 insert into user_rooms(user_id, room_id) values(4, 2);
 insert into user_rooms(user_id, room_id) values(5, 2);
 
+---- drop ----
+DROP TABLE IF EXISTS `room_members`;
+
+---- create ----
+create table IF not exists `room_members` (
+ `id`               BIGINT AUTO_INCREMENT,
+ `name`             VARCHAR(255) NOT NULL UNIQUE,
+ `room_id`          BIGINT NOT NULL,
+ `created_at`       DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+ `updated_at`       DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`)
+) DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
+
+insert into room_members(name, room_id) values("太郎", 1);
+insert into room_members(name, room_id) values("花子", 1);
 
 ---- drop ----
 DROP TABLE IF EXISTS `bills`;
