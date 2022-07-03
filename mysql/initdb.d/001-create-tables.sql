@@ -27,7 +27,7 @@ DROP TABLE IF EXISTS `rooms`;
 create table IF not exists `rooms` (
  `id`               BIGINT AUTO_INCREMENT,
  `name`             VARCHAR(255) NOT NULL,
- `uuid`             VARCHAR(255) NOT NULL,
+ `uuid`             VARCHAR(255) NOT NULL UNIQUE,
  `created_at`       DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
  `updated_at`       DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`)
@@ -63,7 +63,7 @@ DROP TABLE IF EXISTS `room_members`;
 ---- create ----
 create table IF not exists `room_members` (
  `id`               BIGINT AUTO_INCREMENT,
- `name`             VARCHAR(255) NOT NULL UNIQUE,
+ `name`             VARCHAR(255) NOT NULL,
  `room_id`          BIGINT NOT NULL,
  `created_at`       DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
  `updated_at`       DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
