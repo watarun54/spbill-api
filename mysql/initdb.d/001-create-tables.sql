@@ -27,13 +27,14 @@ DROP TABLE IF EXISTS `rooms`;
 create table IF not exists `rooms` (
  `id`               BIGINT AUTO_INCREMENT,
  `name`             VARCHAR(255) NOT NULL,
+ `uuid`             VARCHAR(255) NOT NULL,
  `created_at`       DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
  `updated_at`       DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`)
 ) DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
 
-insert into rooms(name) values("room1");
-insert into rooms(name) values("room2");
+insert into rooms(name, uuid) values("伊豆旅行", UUID());
+insert into rooms(name, uuid) values("ニセコ旅行", UUID());
 
 
 ---- drop ----
@@ -90,8 +91,8 @@ create table IF not exists `bills` (
   PRIMARY KEY (`id`)
 ) DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
 
-insert into bills(name, amount, room_id, payer_id) values("bill1", 1000, 1, 1);
-insert into bills(name, amount, room_id, payer_id) values("bill2", 2000, 1, 2);
+insert into bills(name, amount, room_id, payer_id) values("タクシー代", 1000, 1, 1);
+insert into bills(name, amount, room_id, payer_id) values("ラーメン代", 2000, 1, 2);
 
 ---- drop ----
 DROP TABLE IF EXISTS `bill_payees`;

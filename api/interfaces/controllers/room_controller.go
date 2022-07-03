@@ -31,6 +31,9 @@ func NewRoomController(sqlHandler database.SqlHandler) *RoomController {
 			RoomRepository: &database.RoomRepository{
 				SqlHandler: sqlHandler,
 			},
+			RoomMemberRepository: &database.RoomMemberRepository{
+				SqlHandler: sqlHandler,
+			},
 		},
 		RoomMemberInteractor: usecase.RoomMemberInteractor{
 			RoomMemberRepository: &database.RoomMemberRepository{
@@ -43,12 +46,8 @@ func NewRoomController(sqlHandler database.SqlHandler) *RoomController {
 	}
 }
 
-func (controller *RoomController) Show(c Context) (err error) {
-	id, _ := strconv.Atoi(c.Param("id"))
-	r := domain.Room{
-		ID: id,
-	}
-	room, err := controller.Interactor.Room(r)
+func (controller *RoomController) FindByUUID(c Context) (err error) {
+	room, err := controller.Interactor.FindByUUID(c.Param("uuid"))
 	if err != nil {
 		c.JSON(500, NewError(err))
 		return
@@ -68,10 +67,7 @@ func (controller *RoomController) Index(c Context) (err error) {
 }
 
 func (controller *RoomController) Create(c Context) (err error) {
-	uid := userIDFromToken(c)
-	rForm := domain.RoomForm{
-		UserIds: []int{uid},
-	}
+	rForm := domain.RoomForm{}
 	c.Bind(&rForm)
 	r, err := controller.Interactor.ConvertRoomFormToRoom(rForm)
 	if err != nil {
@@ -79,6 +75,7 @@ func (controller *RoomController) Create(c Context) (err error) {
 		return
 	}
 	room, err := controller.Interactor.Add(r)
+	room.RoomMembers = make([]domain.RoomMember, 0)
 	if err != nil {
 		c.JSON(500, NewError(err))
 		return
@@ -88,9 +85,8 @@ func (controller *RoomController) Create(c Context) (err error) {
 }
 
 func (controller *RoomController) Update(c Context) (err error) {
-	id, _ := strconv.Atoi(c.Param("id"))
 	rForm := domain.RoomForm{}
-	rForm.ID = id
+	rForm.UUID = c.Param("uuid")
 	c.Bind(&rForm)
 	r, err := controller.Interactor.ConvertRoomFormToRoom(rForm)
 	if err != nil {
@@ -107,24 +103,23 @@ func (controller *RoomController) Update(c Context) (err error) {
 }
 
 func (controller *RoomController) Delete(c Context) (err error) {
-	id, _ := strconv.Atoi(c.Param("id"))
-	room := domain.Room{
-		ID: id,
-	}
-	c.Bind(&room)
-	err = controller.Interactor.DeleteById(room)
+	err = controller.Interactor.DeleteByUUID(domain.Room{UUID: c.Param("uuid")})
 	if err != nil {
 		c.JSON(500, NewError(err))
 		return
 	}
-	c.JSON(200, room)
+	c.JSON(200, nil)
 	return
 }
 
 func (controller *RoomController) FetchBills(c Context) (err error) {
-	id, _ := strconv.Atoi(c.Param("id"))
+	room, err := controller.Interactor.FindByUUID(c.Param("uuid"))
+	if err != nil {
+		c.JSON(500, NewError(err))
+		return
+	}
 	bill := domain.Bill{
-		RoomID: id,
+		RoomID: room.ID,
 	}
 	c.Bind(&bill)
 	bills, err := controller.BillInteractor.Bills(bill)
@@ -137,9 +132,13 @@ func (controller *RoomController) FetchBills(c Context) (err error) {
 }
 
 func (controller *RoomController) UserPayments(c Context) (err error) {
-	id, _ := strconv.Atoi(c.Param("id"))
+	room, err := controller.Interactor.FindByUUID(c.Param("uuid"))
+	if err != nil {
+		c.JSON(500, NewError(err))
+		return
+	}
 	bill := domain.Bill{
-		RoomID: id,
+		RoomID: room.ID,
 	}
 	c.Bind(&bill)
 	userPayments, err := controller.BillInteractor.UserPayments(bill)
@@ -151,10 +150,41 @@ func (controller *RoomController) UserPayments(c Context) (err error) {
 	return
 }
 
+func (controller *RoomController) AddBill(c Context) (err error) {
+	room, err := controller.Interactor.FindByUUID(c.Param("uuid"))
+	if err != nil {
+		c.JSON(500, NewError(err))
+		return
+	}
+	bForm := domain.BillForm{RoomID: room.ID}
+	c.Bind(&bForm)
+	b, err := controller.BillInteractor.ConvertBillFormToBill(bForm)
+	if err != nil {
+		c.JSON(500, NewError(err))
+		return
+	}
+	_, err = controller.BillInteractor.Add(b)
+	if err != nil {
+		c.JSON(500, NewError(err))
+		return
+	}
+	newRoom, err := controller.Interactor.Room(room)
+	if err != nil {
+		c.JSON(500, NewError(err))
+		return
+	}
+	c.JSON(200, newRoom)
+	return
+}
+
 func (controller *RoomController) AddMember(c Context) (err error) {
-	id, _ := strconv.Atoi(c.Param("id"))
+	room, err := controller.Interactor.FindByUUID(c.Param("uuid"))
+	if err != nil {
+		c.JSON(500, NewError(err))
+		return
+	}
 	roomMember := domain.RoomMember{
-		RoomID: id,
+		RoomID: room.ID,
 	}
 	c.Bind(&roomMember)
 	_, err = controller.RoomMemberInteractor.Add(roomMember)
@@ -162,12 +192,12 @@ func (controller *RoomController) AddMember(c Context) (err error) {
 		c.JSON(500, NewError(err))
 		return
 	}
-	room, err := controller.Interactor.Room(domain.Room{ID: id})
+	newRoom, err := controller.Interactor.Room(room)
 	if err != nil {
 		c.JSON(500, NewError(err))
 		return
 	}
-	c.JSON(200, room)
+	c.JSON(200, newRoom)
 	return
 }
 
@@ -178,8 +208,7 @@ func (controller *RoomController) DeleteMember(c Context) (err error) {
 		c.JSON(500, NewError(err))
 		return
 	}
-	roomId, _ := strconv.Atoi(c.Param("id"))
-	room, err := controller.Interactor.Room(domain.Room{ID: roomId})
+	room, err := controller.Interactor.FindByUUID(c.Param("uuid"))
 	if err != nil {
 		c.JSON(500, NewError(err))
 		return

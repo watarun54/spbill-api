@@ -39,23 +39,6 @@ func (controller *BillController) Show(c Context) (err error) {
 	return
 }
 
-func (controller *BillController) Create(c Context) (err error) {
-	bForm := domain.BillForm{}
-	c.Bind(&bForm)
-	b, err := controller.Interactor.ConvertBillFormToBill(bForm)
-	if err != nil {
-		c.JSON(500, NewError(err))
-		return
-	}
-	bill, err := controller.Interactor.Add(b)
-	if err != nil {
-		c.JSON(500, NewError(err))
-		return
-	}
-	c.JSON(200, bill)
-	return
-}
-
 func (controller *BillController) Update(c Context) (err error) {
 	id, _ := strconv.Atoi(c.Param("id"))
 	bForm := domain.BillForm{}

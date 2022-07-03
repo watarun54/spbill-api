@@ -6,7 +6,8 @@ type Rooms []Room
 
 type (
 	Room struct {
-		ID          int          `json:"id"`
+		ID          int          `json:"-"`
+		UUID        string       `json:"id"`
 		Name        string       `json:"name"`
 		Users       []User       `json:"users" gorm:"many2many:user_rooms;save_associations:false;"`
 		Bills       []Bill       `json:"-"`

@@ -7,10 +7,11 @@ import (
 type (
 	IRoomRepository interface {
 		FindOne(r domain.Room) (domain.Room, error)
+		FindByUUID(uid string) (domain.Room, error)
 		FindAll() (domain.Rooms, error)
 		Store(r domain.Room) (domain.Room, error)
 		Update(r domain.Room) (domain.Room, error)
-		DeleteById(r domain.Room) error
+		DeleteByUUID(r domain.Room) error
 	}
 
 	RoomInteractor struct {
@@ -24,7 +25,7 @@ func (interactor *RoomInteractor) ConvertRoomFormToRoom(roomForm domain.RoomForm
 	if err != nil {
 		return
 	}
-	room.ID = roomForm.ID
+	room.UUID = roomForm.UUID
 	room.Name = roomForm.Name
 	room.Users = users
 	return
@@ -32,6 +33,11 @@ func (interactor *RoomInteractor) ConvertRoomFormToRoom(roomForm domain.RoomForm
 
 func (interactor *RoomInteractor) Room(r domain.Room) (room domain.Room, err error) {
 	room, err = interactor.RoomRepository.FindOne(r)
+	return
+}
+
+func (interactor *RoomInteractor) FindByUUID(uid string) (room domain.Room, err error) {
+	room, err = interactor.RoomRepository.FindByUUID(uid)
 	return
 }
 
@@ -50,7 +56,7 @@ func (interactor *RoomInteractor) Update(r domain.Room) (room domain.Room, err e
 	return
 }
 
-func (interactor *RoomInteractor) DeleteById(r domain.Room) (err error) {
-	err = interactor.RoomRepository.DeleteById(r)
+func (interactor *RoomInteractor) DeleteByUUID(r domain.Room) (err error) {
+	err = interactor.RoomRepository.DeleteByUUID(r)
 	return
 }
