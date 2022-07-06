@@ -18,7 +18,7 @@ func NewBillController(sqlHandler database.SqlHandler) *BillController {
 			BillRepository: &database.BillRepository{
 				SqlHandler: sqlHandler,
 			},
-			UserRepository: &database.UserRepository{
+			RoomMemberRepository: &database.RoomMemberRepository{
 				SqlHandler: sqlHandler,
 			},
 		},
@@ -36,23 +36,6 @@ func (controller *BillController) Show(c Context) (err error) {
 		return
 	}
 	c.JSON(200, NewResponse(bill))
-	return
-}
-
-func (controller *BillController) Create(c Context) (err error) {
-	bForm := domain.BillForm{}
-	c.Bind(&bForm)
-	b, err := controller.Interactor.ConvertBillFormToBill(bForm)
-	if err != nil {
-		c.JSON(500, NewError(err))
-		return
-	}
-	bill, err := controller.Interactor.Add(b)
-	if err != nil {
-		c.JSON(500, NewError(err))
-		return
-	}
-	c.JSON(200, bill)
 	return
 }
 

@@ -27,13 +27,14 @@ DROP TABLE IF EXISTS `rooms`;
 create table IF not exists `rooms` (
  `id`               BIGINT AUTO_INCREMENT,
  `name`             VARCHAR(255) NOT NULL,
+ `uuid`             VARCHAR(255) NOT NULL UNIQUE,
  `created_at`       DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
  `updated_at`       DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`)
 ) DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
 
-insert into rooms(name) values("room1");
-insert into rooms(name) values("room2");
+insert into rooms(name, uuid) values("伊豆旅行", UUID());
+insert into rooms(name, uuid) values("ニセコ旅行", UUID());
 
 
 ---- drop ----
@@ -56,6 +57,25 @@ insert into user_rooms(user_id, room_id) values(3, 1);
 insert into user_rooms(user_id, room_id) values(4, 2);
 insert into user_rooms(user_id, room_id) values(5, 2);
 
+---- drop ----
+DROP TABLE IF EXISTS `room_members`;
+
+---- create ----
+create table IF not exists `room_members` (
+ `id`               BIGINT AUTO_INCREMENT,
+ `name`             VARCHAR(255) NOT NULL,
+ `room_id`          BIGINT NOT NULL,
+ `created_at`       DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+ `updated_at`       DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`)
+) DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
+
+insert into room_members(name, room_id) values("太郎", 1);
+insert into room_members(name, room_id) values("花子", 1);
+insert into room_members(name, room_id) values("連", 1);
+insert into room_members(name, room_id) values("健二", 2);
+insert into room_members(name, room_id) values("玲子", 2);
+insert into room_members(name, room_id) values("晋三", 2);
 
 ---- drop ----
 DROP TABLE IF EXISTS `bills`;
@@ -72,8 +92,10 @@ create table IF not exists `bills` (
   PRIMARY KEY (`id`)
 ) DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
 
-insert into bills(name, amount, room_id, payer_id) values("bill1", 1000, 1, 1);
-insert into bills(name, amount, room_id, payer_id) values("bill2", 2000, 1, 2);
+insert into bills(name, amount, room_id, payer_id) values("タクシー代", 1000, 1, 1);
+insert into bills(name, amount, room_id, payer_id) values("ラーメン代", 2000, 1, 2);
+insert into bills(name, amount, room_id, payer_id) values("高速代", 10000, 2, 3);
+insert into bills(name, amount, room_id, payer_id) values("ホテル代", 20000, 2, 4);
 
 ---- drop ----
 DROP TABLE IF EXISTS `bill_payees`;
@@ -90,3 +112,9 @@ create table IF not exists `bill_payees` (
 
 insert into bill_payees(bill_id, payee_id) values(1, 2);
 insert into bill_payees(bill_id, payee_id) values(1, 3);
+insert into bill_payees(bill_id, payee_id) values(2, 3);
+insert into bill_payees(bill_id, payee_id) values(2, 1);
+insert into bill_payees(bill_id, payee_id) values(3, 4);
+insert into bill_payees(bill_id, payee_id) values(3, 5);
+insert into bill_payees(bill_id, payee_id) values(4, 3);
+insert into bill_payees(bill_id, payee_id) values(4, 5);

@@ -42,23 +42,26 @@ func Init() {
 	line.POST("", func(c echo.Context) error { return linebotController.Post(c) })
 
 	api := e.Group("/api")
-	api.Use(middleware.JWTWithConfig(controllers.NewJWTConfig()))
-	api.GET("/users/:id", func(c echo.Context) error { return userController.Show(c) })
-	api.GET("/users/me", func(c echo.Context) error { return userController.GetMe(c) })
-	api.PUT("/users/me", func(c echo.Context) error { return userController.UpdateMe(c) })
 
-	api.POST("/bills", func(c echo.Context) error { return billController.Create(c) })
 	api.GET("/bills/:id", func(c echo.Context) error { return billController.Show(c) })
 	api.PUT("/bills/:id", func(c echo.Context) error { return billController.Update(c) })
 	api.DELETE("/bills/:id", func(c echo.Context) error { return billController.Delete(c) })
 
 	api.GET("/rooms", func(c echo.Context) error { return roomController.Index(c) })
 	api.POST("/rooms", func(c echo.Context) error { return roomController.Create(c) })
-	api.GET("/rooms/:id", func(c echo.Context) error { return roomController.Show(c) })
-	api.PUT("/rooms/:id", func(c echo.Context) error { return roomController.Update(c) })
-	api.DELETE("/rooms/:id", func(c echo.Context) error { return roomController.Delete(c) })
-	api.GET("/rooms/:id/bills", func(c echo.Context) error { return roomController.FetchBills(c) })
-	api.GET("/rooms/:id/user_payments", func(c echo.Context) error { return roomController.UserPayments(c) })
+	api.GET("/rooms/:uuid", func(c echo.Context) error { return roomController.FindByUUID(c) })
+	api.PUT("/rooms/:uuid", func(c echo.Context) error { return roomController.Update(c) })
+	api.DELETE("/rooms/:uuid", func(c echo.Context) error { return roomController.Delete(c) })
+	api.GET("/rooms/:uuid/bills", func(c echo.Context) error { return roomController.FetchBills(c) })
+	api.POST("/rooms/:uuid/bills", func(c echo.Context) error { return roomController.AddBill(c) })
+	api.GET("/rooms/:uuid/user_payments", func(c echo.Context) error { return roomController.UserPayments(c) })
+	api.POST("/rooms/:uuid/members", func(c echo.Context) error { return roomController.AddMember(c) })
+	api.DELETE("/rooms/:uuid/members/:member_id", func(c echo.Context) error { return roomController.DeleteMember(c) })
+
+	api.Use(middleware.JWTWithConfig(controllers.NewJWTConfig()))
+	api.GET("/users/:id", func(c echo.Context) error { return userController.Show(c) })
+	api.GET("/users/me", func(c echo.Context) error { return userController.GetMe(c) })
+	api.PUT("/users/me", func(c echo.Context) error { return userController.UpdateMe(c) })
 
 	// Start server
 	isLambda := os.Getenv("LAMBDA")
